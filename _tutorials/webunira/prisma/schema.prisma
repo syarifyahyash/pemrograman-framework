@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Fakultas{
+  id_fakultas    Int     @id @default(autoincrement())
+  nama_fakultas String
+}
+
+model Prodi{
+  id_prodi    Int     @id @default(autoincrement())
+  id_fakultas Int
+  nama_prodi String
+}
+
+model Testimoni{
+  id_testimoni    Int     @id @default(autoincrement())
+  id_fakultas     Int
+  testimoner String
+  pekerjaan_testimoner String
+  isi_testimoni String @db.Text
+  foto_testimoni String @db.Text
+  tgl_testimoni DateTime
+}
+
+model Galeri{
+  id_galeri    Int     @id @default(autoincrement())
+  id_fakultas  Int
+  judul_galeri String
+  tgl_posting String @db.Text
+  nis String
+  status Int
+}
+
+model Detil_Galeri{
+  id_detil_galeri    Int     @id @default(autoincrement())
+  id_galeri          Int
+  gambar  String  @db.Text
+  keterangan String @db.Text
+}
+
+model Content{
+  id_content    Int     @id @default(autoincrement())
+  id_jenis_kontent Int
+  id_fakultas   Int
+  id_prodi      Int
+  judul_content String
+  isi_content String @db.Text
+  tanggal_posting DateTime
+  gambar_content String @db.Text
+  nis String
+  status Int
+  dibaca Int
+}
+
+model Header{
+  id_header    Int     @id @default(autoincrement())
+  id_fakultas  Int
+  judul_header String
+  subjudul_header String
+  gambar_header String @db.Text
+}
+
+model Unit{
+  id_unit    Int     @id @default(autoincrement())
+  nama_unit String
+}
+
+model Dokar{
+  nis String @id
+  id_prodi Int
+  id_unit Int
+  nidn String
+  nama String
+}
+
+model Kegiatan{
+  id_kegiatan    Int     @id @default(autoincrement())
+  id_prodi       Int
+  id_fakultas    Int
+  judul_kegiatan String
+  isi_kegiatan String @db.Text
+  tanggal_mulai DateTime
+  tanggal_akhir DateTime
+  tanggal_posting DateTime
+  lokasi String
+  nis String
+  status Int
+}
+
+model Wilayah_KerjaSama{
+  id_wilayah_kerjasama    Int     @id @default(autoincrement())
+  nama_wilayah_kerjasama String
+}
+
+model Jenis_KerjaSama{
+  id_jenis_kerjasama    Int     @id @default(autoincrement())
+  nama_jenis_kerjasama String
+}
+
+model KerjaSama{
+  id_kerjasama    Int     @id @default(autoincrement())
+  id_jenis_kerjasama Int
+  id_fakultas Int
+  judul_kerjasama String
+  isi_kerjasama String @db.Text
+  tanggal_posting DateTime
+  nis String
+  status Int
+  gambar_kerjasama String @db.Text
+}
+
+model KerjaSama_BBK{
+  id_kerjasama    Int     @id @default(autoincrement())
+  id_fakultas Int
+  id_rak  Int
+  id_wilayah_kerjasama Int
+  id_jenis_kerjasama Int
+  nis String
+  judul_kerjasama String
+  isi_kerjasama String @db.Text
+  pihak_1 String
+  pihak_2 String
+  tanggal_kerjasama DateTime
+  tanggal_kadaluarsa DateTime
+  file_kerjasama String @db.Text
+  status Int
+  gambar_kerjasama String @db.Text
+  tanggal_posting DateTime
+}
