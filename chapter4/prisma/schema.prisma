@@ -43,7 +43,7 @@ model Testimoni {
   pekerjaan_testimoner String   @db.VarChar(30)
   isi_testimoni        String   @db.Text
   foto_testimoni       String?  @db.Text
-  tgl_testimoni        DateTime
+  tgl_testimoni        DateTime @db.Date
   fakultas             Fakultas @relation(fields: [id_fakultas], references: [id_fakultas])
 }
 
@@ -51,7 +51,7 @@ model Galeri {
   id_galeri       Int            @id @default(autoincrement())
   id_fakultas     Int
   judul_galeri    String         @db.VarChar(200)
-  tanggal_posting DateTime
+  tanggal_posting DateTime       @db.Date
   nis             String         @db.VarChar(10)
   status          Int            @default(0) @db.TinyInt
   detil_galeri    Detil_Galeri[]

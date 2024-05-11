@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const fakultas = require('./fakultas');
-const galeri = require('./galeri');
+const prodi = require('./prodi');
+const testimoni = require('./testimoni');
 
 router.use('/', fakultas);
-router.use('/', galeri);
+router.use('/', prodi);
+router.use('/', testimoni);
 
 module.exports = router;

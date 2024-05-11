@@ -1,6 +1,28 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const createGaleri = async (req, res, next) => {
+  try {
+    const result = await prisma.galeri.create({
+      data:{
+        id_fakultas: req.body.id_fakultas,
+        judul_galeri: req.body.judul_galeri,
+        tanggal_posting: req.body.tanggal_posting,
+        nis: req.body.nis,
+        status: req.body.status,
+      }
+    });
+
+    return res.json({
+      status: 200,
+      message: 'Galeri berhasil dibuat!',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 const getGaleri = async (req, res, next) => {
   try {
     const result = await prisma.galeri.findMany();
@@ -33,28 +55,6 @@ const getGaleriById = async (req, res, next) => {
   }
 }
 
-const createGaleri = async (req, res, next) => {
-  try {
-    const result = await prisma.galeri.create({
-      data:{
-        id_fakultas: parseInt(req.body.id_fakultas),
-        judul_galeri: req.body.judul_galeri,
-        tanggal_posting: req.body.tanggal_posting,
-        nis: req.body.nis,
-        status: parseInt(req.body.status)
-      }
-    });
-
-    return res.json({
-      status: 200,
-      message: 'Galeri berhasil dibuat!',
-      data: result
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
 const updateGaleri = async (req, res, next) => {
   try {
     const result = await prisma.galeri.update({
@@ -62,11 +62,11 @@ const updateGaleri = async (req, res, next) => {
         id_galeri: parseInt(req.params.id)
       },
       data:{
-        id_fakultas: parseInt(req.body.id_fakultas),
+        id_fakultas: req.body.id_fakultas,
         judul_galeri: req.body.judul_galeri,
         tanggal_posting: req.body.tanggal_posting,
         nis: req.body.nis,
-        status: parseInt(req.body.status)
+        status: req.body.status,
       }
     });
 
@@ -84,7 +84,7 @@ const destroyGaleri = async (req, res, next) => {
   try {
     const result = await prisma.galeri.delete({
       where:{
-        id_galeri: parseInt(req.params.id)
+        id_Galeri: parseInt(req.params.id)
       }
     });
 
@@ -98,4 +98,5 @@ const destroyGaleri = async (req, res, next) => {
   }
 }
 
-module.exports = {getGaleri,getGaleriById,createGaleri, updateGaleri,destroyGaleri}
+
+module.exports = {createGaleri, getGaleri, getGaleriById, updateGaleri, updateFotoGaleri, destroyGaleri};
