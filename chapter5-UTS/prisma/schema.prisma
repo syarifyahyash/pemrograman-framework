@@ -1,0 +1,284 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Mahasiswa{
+  id        Int      @id @default(autoincrement())
+  id_prodi  Int
+  id_peminatan Int
+  nim       String @db.VarChar(20)
+  nama_mahasiswa String
+  thumbnail String @db.Text
+  phone String @db.VarChar(15)
+}
+
+model Tagihan{
+  id       Int      @id @default(autoincrement())
+  id_mahasiswa Int
+  nominal String @db.VarChar(25)
+  tagihan Float @db.Double
+}
+
+model batas_pendaftaran{
+  id       Int      @id @default(autoincrement())
+  id_prodi Int
+  id_tahun_akademik Int
+  waktu_mulai DateTime @db.DateTime
+  waktu_selesai DateTime @db.DateTime
+}
+
+model Administrator{
+  id       Int      @id @default(autoincrement())
+  username String @db.VarChar(50)
+  password String @db.VarChar(50)
+}
+
+model Dosen{
+  id Int @id @default(autoincrement())
+  id_prodi Int
+  nis Int
+  nama_dosen String @db.VarChar(100)
+  phone String @db.VarChar(15)
+  thumbnail String @db.Text
+  jabatan_akademik String @db.VarChar(100)
+  Dosen_Pembimbing Dosen_Pembimbing[]
+  Dosen_Bidang_Keahlian Dosen_Bidang_Keahlian[]
+  Dosen_Penguji Dosen_Penguji[]
+}
+
+model Dosen_Penguji{
+  id Int @id @default(autoincrement())
+  id_dosen Int
+  id_ujian_sidang Int
+  koordinator Boolean
+  status_penguji status_penguji
+  Dosen Dosen @relation(fields: [id_dosen], references: [id])
+}
+
+enum status_penguji{
+  Menunggu_Persetujuan
+  Ditolak
+  Diterima
+  Aktif
+}
+
+model Dosen_Bidang_Keahlian{
+  id Int @id @default(autoincrement())
+  id_dosen Int
+  id_bidang_keahlian Int
+  koodinator Boolean
+  Dosen Dosen @relation(fields: [id_dosen], references: [id])
+}
+
+model Bidang_Keahlian{
+  id Int @id @default(autoincrement())
+  nama_bidang_keahlian String @db.VarChar(100)
+}
+
+model Dosen_Pembimbing{
+  id Int @id @default(autoincrement())
+  id_dosen Int
+  id_usulan_skripsi Int
+  status_dosbing status_dosbing
+  Dosen Dosen @relation(fields: [id_dosen], references: [id])
+}
+
+enum status_dosbing{
+  Menunggu_Persetujuan
+  Ditolak
+  Diterima
+  Aktif
+  Kadaluarsa
+}
+
+model Usulan_Skripsi{
+  id Int @id @default(autoincrement())
+  id_tahun_akademik Int
+  id_mahasiswa Int
+  judul String @db.VarChar(200)
+  deskripsi String @db.Text
+  status_usulan status_usulan
+  batas_tahun_akademin Int
+  batas_semester Int
+}
+
+enum status_usulan{
+  Menunggu_Persetujuan
+  Ditolak
+  Direvisi
+  Direkomendasikan_Ketua_Keahlian
+  Direkomendasikan_Ketua_Keahlian_Dengan_Catatan
+  Disetujui_Dosen_Pembimbing
+  Disetujui_Ketua_Prodi
+  Proposal_Disetujui
+  Proposal_Disetujui_Dengan_Catatan
+  Proposal_Ditolak
+  Selesai
+}
+
+model Detail_Usulan_Skripsi{
+  id Int @id @default(autoincrement())
+  id_usulan_skripsi Int
+  judul String @db.VarChar(200)
+  file String @db.Text
+  keterangan String @db.Text
+}
+
+model Perbaikan_Usulan{
+  id Int @id @default(autoincrement())
+  id_usulan_skripsi Int
+  id_dosen_keahlian Int
+  keterangan String @db.Text
+  status_perbaikan_usulan status_perbaikan_usulan
+}
+
+enum status_perbaikan_usulan{
+  Revisi
+  Disetujui
+}
+
+model History_Usulan_Skripsi{
+  id Int @id @default(autoincrement())
+  id_usulan_skripsi Int
+  text String @db.Text 
+  tanggal DateTime @db.DateTime
+}
+
+model Perbaikan_Bimbingan{
+  id Int @id @default(autoincrement())
+  id_berita_acara_bimbingan Int
+  keterangan String @db.Text
+}
+
+model Berita_Acara_Bimbingan{
+  id Int @id @default(autoincrement())
+  id_usulan_skripsi Int
+  file String @db.Text
+  keterangan String @db.Text
+  status_berita_acara status_berita_acara
+}
+
+enum status_berita_acara{
+  Belum_Valid
+  Valid
+}
+
+model Ujian_Sidang{
+  id Int @id @default(autoincrement())
+  id_ruang Int
+  id_kategori_ujian Int
+  id_pendafataran_ujian Int
+  tanggal_sidang DateTime @db.DateTime
+}
+
+model Perbaikan{
+  id Int @id @default(autoincrement())
+  id_dosen_penguji Int
+  id_ujian_sidang Int
+  keterangan String @db.Text
+  file String @db.Text
+  status_perbaikan status_perbaikan
+}
+
+enum status_perbaikan{
+  Belum_Valid
+  Valid
+}
+
+model Pendaftaran_Ujian{
+  id Int @id @default(autoincrement())
+  id_usulan_skripsi Int
+  id_kategori_ujian Int
+  tanggal_mendaftar DateTime @db.DateTime
+}
+
+model Detail_Pendaftaran_Ujian{
+  id Int @id @default(autoincrement())
+  id_pendaftaran_ujian Int
+  id_syarat_pendaftaran_ujian Int
+  status_pendaftaran_ujian Boolean
+}
+
+model Syarat_Pendaftaran_Ujian{
+  id Int @id @default(autoincrement())
+  id_prodi Int
+  keterangan String @db.Text
+  id_kategori_ujian Int
+  status Boolean
+}
+
+model Kategori_Ujian{
+  id Int @id @default(autoincrement())
+  id_prodi Int
+  nama_kategori String @db.VarChar(200)
+}
+
+model Kategori_Nilai_Ujian{
+  id Int @id @default(autoincrement())
+  id_kategori_ujian Int
+  prosentase Float @db.Double
+  nama_kategori String @db.VarChar(200)
+  status Boolean
+}
+
+model Kategori_Nilai_Penguji{
+  id Int @id @default(autoincrement())
+  kategori_penguji String @db.VarChar(200)
+  prosentase Float @db.Double
+}
+
+model Kriteria_Nilai_Ujian{
+  id Int @id @default(autoincrement())
+  id_kategori_nilai_ujian Int
+  kriteria String @db.VarChar(200)
+  prosentase Float @db.Double
+  status Boolean
+}
+
+model Nilai{
+  id Int @id @default(autoincrement())
+  id_dosen Int
+  id_kategori_nilai_ujian Int
+  id_ujian_sidang Int
+  nilai_total Float @db.Double
+  nilai_prosentase Float @db.Double
+}
+
+model Detail_Nilai{
+  id Int @id @default(autoincrement())
+  id_nilai Int
+  id_kriteria_nilai_ujian Int
+  nilai Float @db.Double
+  nilai_prosentase Float @db.Double
+  prosentase Float @db.Double
+}
+
+model Seminar_Hasil{
+  id Int @id @default(autoincrement())
+  id_seminar_proposal Int
+  tanggal_sidang DateTime @db.DateTime
+}
+
+model Perbaikan_Seminar_Hasil{
+  id Int @id @default(autoincrement())
+  id_seminar_hasil Int
+  id_dosen_penguji Int
+  keterangan String @db.Text
+  status_perbaikan_seminar status_perbaikan_seminar
+}
+
+enum status_perbaikan_seminar{
+  Valid
+  Belum_Valid
+}
