@@ -5,21 +5,37 @@ const { generateToken, decodeToken } = require('../helpers/token');
 
 const login = async (req, res, next) => {
   try {
-    const usernya = 'umar';
-    const passwordnya = bcrypt.hashSync('123', 10);
-    const { username, password } = req.body;
-    if (usernya == username && bcrypt.compareSync(password, passwordnya)) {
-      return res.json({
-        status: true,
-        message: 'anda berhasil login',
-        data: generateToken({
-          username
-        })
+    // const usernya = 'umar';
+    // const passwordnya = bcrypt.hashSync('123', 10);
+    const { email, password } = req.body;
+    const existUser = await prisma.user.findFirst({
+      where: {
+        email
+      }
+    });
+
+    if(!existUser){
+      return res.status(404).json({
+        status: false,
+        message: 'Username tidak ditemukan'
       });
     }
-    return res.json({
-      status: false,
-      message: 'account not found'
+
+    const validUser = bcrypt.compareSync(password, existUser.password);
+
+    if(!validUser){
+      return res.status(401).json({
+        status: false,
+        message: 'Password tidak valid'
+      });
+    }
+
+    return  res.json({
+      status: true,
+      message: 'Login berhasil',
+      data: {
+        token: generateToken(existUser)
+      }
     });
   } catch (error) {
     next(error);
