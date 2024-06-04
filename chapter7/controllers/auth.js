@@ -1,0 +1,90 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+const bcrypt = require('bcrypt');
+const { generateToken, decodeToken } = require('../helpers/token');
+
+const login = async (req, res, next) => {
+  try {
+    const usernya = 'umar';
+    const passwordnya = bcrypt.hashSync('123', 10);
+    const { username, password } = req.body;
+    if (usernya == username && bcrypt.compareSync(password, passwordnya)) {
+      return res.json({
+        status: true,
+        message: 'anda berhasil login',
+        data: generateToken({
+          username
+        })
+      });
+    }
+    return res.json({
+      status: false,
+      message: 'account not found'
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+const saya = async (req, res, next) => {
+  try {
+    // const body = req.body;
+    const { token } = req.query;
+    console.log(token);
+    const validation = decodeToken(token);
+    return res.json(validation)
+  } catch (error) {
+    next(error);
+  }
+}
+
+const registration = async (req, res, next) => {
+  try {
+    const body = req.body;
+    validateBodyRequest(body, res);
+    const user = await prisma.user.create({
+      data: {
+        username: body.username,
+        password: bcrypt.hashSync(body.password, 10),
+        email: body.email
+      }
+    });
+
+    return res.status(201).json({
+      status: true,
+      message: 'Data user berhasil di tambahkan',
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+function validateBodyRequest (body, res) {
+  if(body.username == '' || body.username == undefined || body.username == null){
+    return res.status(400).json({
+      status: false,
+      message: 'username tidak boleh kosong'
+    });
+  }
+
+  if (body.password == '' || body.password == undefined || body.password == null) { 
+    return res.status(400).json({
+      status: false,
+      message: 'password tidak boleh kosong'
+    });
+  }
+
+  if(body.email == '' || body.email == undefined || body.email == null){
+    return res.status(400).json({
+      status: false,
+      message: 'email tidak boleh kosong'
+    });
+  }
+}
+
+module.exports = {
+  login,
+  saya,
+  registration
+}
