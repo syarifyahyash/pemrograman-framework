@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 router.post('/login', auth.login );
 router.post('/registration', auth.registration );
 router.get('/saya', auth.saya );
-
+router.post('/loginSimat', auth.loginSimat);
 router.get('/khusus-mahasiswa' , authorization(['mhs']), (req, res,next) => {
   try {
     return res.json({
@@ -26,6 +26,7 @@ router.get('/khusus-mahasiswa' , authorization(['mhs']), (req, res,next) => {
   } catch (error) {
     next(error);
   }
+
   
 });
 

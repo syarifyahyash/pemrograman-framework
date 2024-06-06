@@ -9,7 +9,7 @@ function authorization(roles = []){
     (req, res, next) => {
       try {
         const token = req.headers['authorization'];
-        console.log(token);
+        // console.log(token);
         const user = decodeToken(token);
         const validToken = roles.find((level) => level == user.role);
 

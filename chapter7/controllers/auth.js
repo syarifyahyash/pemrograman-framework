@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const { generateToken, decodeToken } = require('../helpers/token');
+const axios = require('axios');
 
 const login = async (req, res, next) => {
   try {
@@ -36,6 +37,46 @@ const login = async (req, res, next) => {
       data: {
         token: generateToken(existUser)
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+const loginSimat = async (req, res, next) => {
+  try {
+    const { nim, password } = req.body;
+    const response = await axios.post('https://api.unira.ac.id/v1/token', {
+      username: nim,
+      password
+    }, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    const response2 = await axios.get('https://api.unira.ac.id/v1/saya', {
+      headers: {
+        'Authorization': 'Bearer ' + response.data.data.attributes.access
+      }
+    });
+
+    const user = await prisma.user.create({
+      data: {
+        username: response2.data.data.id,
+        password: bcrypt.hashSync(password, 10),
+        email: response2.data.data.attributes.email,
+        thumbnail: response2.data.data.attributes.thumbnail,
+        role: response2.data.data.attributes.type
+      }
+    });
+
+    return res.json({
+      status: true,
+      message: 'Login berhasil dan Data berhasil tersimpan',
+      data: response2.data,
+      dataInputLogin: user
+    
     });
   } catch (error) {
     next(error);
@@ -102,5 +143,6 @@ function validateBodyRequest (body, res) {
 module.exports = {
   login,
   saya,
-  registration
+  registration,
+  loginSimat
 }
